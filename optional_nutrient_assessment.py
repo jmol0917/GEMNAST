@@ -54,11 +54,7 @@ amino_acids = {'D-alanine': "EX_ala_D(e)", 'alanine': "EX_ala_L(e)",
                'L-serine': "EX_ser_L(e)", 'threonine': "EX_thr_L(e)",
                'tryptophan': "EX_trp_L(e)", 'tyrosine': "EX_tyr_L(e)",
                'valine': "EX_val_L(e)", 'aspactic acid': "EX_asp_L(e)",
-               'L-methionine sulfoxide': "EX_metsox_S_L(e)",
-
-               # some strains need these dipeptides to grow, these are also removed when the corresponding group is
-               'cysteinylglycine': 'EX_cgly(e)',
-               'Gly-Cys': 'EX_glycys(e)', 'L-cystine': "EX_Lcystin(e)"
+               'L-methionine sulfoxide': "EX_metsox_S_L(e)"
                }
 
 cations = {
@@ -176,8 +172,6 @@ other = {
     'Carnitine': "EX_crn(e)", 'Ornithine': "EX_orn(e)", 'Spermidine': 'EX_spmd(e)'
 }
 
-# nutrients from every group are added to the media. Nutrients inspected for production are removed from the media
-# below
 rich_media_no_explored_n = {}
 rich_media_no_explored_n.update(simple_sugars)
 rich_media_no_explored_n.update(amino_acids)
@@ -200,7 +194,6 @@ explored_groups = {
            'nicotinamide adenine dinucleotide': "nad"},
     'B5': {'pantothenic acid': "pnto_R"},
     'B6': {'pyridoxine': "pydxn", 'pyridoxal': "pydx", 'pyridoxamine': "pydam", 'pyridoxal 5-phosphate': "pydx5p"},
-    # 'B7': {'biotin': "btn"},
     'B9': {'folic acid': "fol", 'tetrahydrofolic acid': "thf", '5-methyltetrahydrofolate': "5mthf"},
     'B12': {'cobalamin I': "cbl1", 'cobalamin II': "cbl2", 'adenosylcobalamin': "adocbl"},
     'K': {'menaquionine-7': "mqn7", 'menaquionine-8': "mqn8", 'demethylmenaquinone': "2dmmq8",
@@ -210,9 +203,6 @@ explored_groups = {
 # Creates a list of bacteria names (models) located in the path_in directory when running several microbes at once
 models_in = [f for f in listdir(path_in) if isfile(join(path_in, f))]
 models_in = [os.path.splitext(f)[0] for f in models_in]
-
-# Testing individual models
-# models_in = ['Enterococcus_faecalis_V583']
 
 rich_media_df = pd.DataFrame()
 
@@ -229,9 +219,6 @@ for name in models_in:
     microbe_boolean_table = pd.DataFrame()
 
     for explored_group in explored_groups:
-
-        # Most recent update 18/10/2021: I have moved the following line from line 227 to this location to load the
-        # model every time a new metabolite is examined. This prevents crashes.
         model = cobra.io.read_sbml_model(path_in + name + '.xml')
 
         media_dict = rich_media_df.to_dict()
@@ -239,15 +226,12 @@ for name in models_in:
 
         group_of_reactions = explored_groups[explored_group]
 
-        # remove reactions that belong to the same group from the media above
         for metabolite in group_of_reactions:
             reaction = group_of_reactions[metabolite]
             ex_reaction = 'EX_' + reaction + '(e)'
             if ex_reaction in uptakes:
                 del uptakes[ex_reaction]
-
-        # value is out of the lower loop, so if value changes for one of the reactions in the current group it
-        # conserves a value of 1 even if the later reactions in the group don't return a positive outcome.
+                
         value = 0
 
         for metabolite in group_of_reactions:
