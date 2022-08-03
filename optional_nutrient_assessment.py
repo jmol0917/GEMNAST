@@ -4,9 +4,8 @@ on 26/03/2021
 """
 
 """
-This script reads individual microbial GSMs from a file location. Microbes metabolism is then inspected to check if a 
-nutrient that has been previously removed from the media has been synthesized intra-cellularly. The set of 
-nutrients to be inspected has to be specified.
+This script reads individual GSMs from a file location. GSMs are then inspected to check if a 
+nutrient that has been previously removed from the media has been synthesized intra-cellularly.
 """
 
 import cobra
@@ -31,7 +30,6 @@ if not os.path.exists(path_out + output_folder):
     os.makedirs(path_out + output_folder + 'compilation/')
     os.makedirs(path_out + output_folder + 'cluster/')
 
-# Dictionary with experimental energy sources
 simple_sugars = {'D-glucose': "EX_glc_D(e)", 'fructose': "EX_fru(e)",
                  'galactose': "EX_gal(e)", 'mannose': "EX_man(e)",
                  'ribose': "EX_rib_D(e)", 'lactose': "EX_lcts(e)",
@@ -237,6 +235,7 @@ for name in models_in:
         for metabolite in group_of_reactions:
             reaction = group_of_reactions[metabolite]
             explored_metabolite = reaction + '[c]'
+            ex_reaction = 'EX_' + reaction + '(e)'
             with model:
                 medium = model.medium
 
