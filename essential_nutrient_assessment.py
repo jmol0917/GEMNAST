@@ -5,11 +5,7 @@ on 01/07/2020
 
 """
 This script was designed to test every possible combination of a set of nutrients that are added to a 
-Universally Defined Media (UDM).
-The components of both, UDM media and the list of nutrients to be tested, should be specified as
-dictionaries below. 
-
-It has been expanded to work with other nutrient dimensions.
+Universally Defined Media and determine essential nutrients for a given GSM
 """
 
 import cobra
@@ -20,10 +16,8 @@ import os
 from os import listdir
 from os.path import isfile, join
 import warnings
-
 warnings.filterwarnings("error")
 
-# Local path options
 path_out = ''
 path_in = ''
 
@@ -200,9 +194,7 @@ final_compilation_table = pd.DataFrame()
 
 for file in models_in:
     print(file)
-
-    # an SBML model is loaded to be simulated
-    model = cobra.io.read_sbml_model(path_in + file + '.xml')  # Models with the same name as 'file' are loaded
+    model = cobra.io.read_sbml_model(path_in + file + '.xml') 
     
     rich_media_no_exp_source_df = pd.DataFrame()
 
@@ -284,7 +276,6 @@ for file in models_in:
 
             solution = model.optimize()
 
-    #     Uncomment the line below to write one file per model to the directory specified on path_out
     final_boolean_table.to_csv(path_out + output_folder + 'consumption/growth_no-growth/' + file + '.csv')
 
 with open(path_out + output_folder + 'experimental_design.txt', 'w') as file:
